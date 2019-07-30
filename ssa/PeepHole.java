@@ -126,7 +126,8 @@ public class PeepHole implements LocalTransformer {
 					}
 
 					// Constant folding
-					if (node.opCode == Op.SET && (node.kid(1).opCode == Op.ADD || node.kid(1).opCode == Op.MUL || node.kid(1).opCode == Op.SUB || node.kid(1).opCode == Op.DIVS || node.kid(1).opCode == Op.DIVU) &&
+					if (node.opCode == Op.SET && (node.kid(1).opCode == Op.ADD || node.kid(1).opCode == Op.MUL || node.kid(1).opCode == Op.SUB ||
+							node.kid(1).opCode == Op.DIVS || node.kid(1).opCode == Op.DIVU || node.kid(1).opCode == Op.MODU || node.kid(1).opCode == Op.MODS) &&
 							((node.kid(1).kid(0).opCode == Op.INTCONST || node.kid(1).kid(0).opCode == Op.FLOATCONST) && (node.kid(1).kid(1).opCode == Op.INTCONST || node.kid(1).kid(1).opCode == Op.FLOATCONST))) {
 						System.out.println("---Constant Folding---");
 						System.out.println(node.toString()+" is ");
@@ -180,6 +181,10 @@ public class PeepHole implements LocalTransformer {
 				// Unsigned and signed integers are treated the same here
 			case Op.DIVS:
 				return first / second;
+			case Op.MODU:
+				// Unsigned and signed integers are treated the same here
+			case Op.MODS:
+				return first % second;
 			default:
 				throw new Error("Reached unexpected case in evaluating");
 		}
@@ -196,6 +201,10 @@ public class PeepHole implements LocalTransformer {
 				// Unsigned and signed integers are treated the same here
 			case Op.DIVS:
 				return first / second;
+			case Op.MODU:
+				// Unsigned and signed integers are treated the same here
+			case Op.MODS:
+				return first % second;
 			default:
 				throw new Error("Reached unexpected case in evaluating");
 		}
@@ -212,6 +221,10 @@ public class PeepHole implements LocalTransformer {
 				// Unsigned and signed integers are treated the same here
 			case Op.DIVS:
 				return first / second;
+			case Op.MODU:
+				// Unsigned and signed integers are treated the same here
+			case Op.MODS:
+				return first % second;
 			default:
 				throw new Error("Reached unexpected case in evaluating");
 		}
@@ -228,6 +241,10 @@ public class PeepHole implements LocalTransformer {
 				// Unsigned and signed integers are treated the same here
 			case Op.DIVS:
 				return first / second;
+			case Op.MODU:
+				// Unsigned and signed integers are treated the same here
+			case Op.MODS:
+				return first % second;
 			default:
 				throw new Error("Reached unexpected case in evaluating");
 		}
@@ -253,9 +270,15 @@ public class PeepHole implements LocalTransformer {
 				if (node.kid(1).kid(0).opCode == Op.REG && logicalShift(((LirIconst) node.kid(1).kid(1)).value) != 0) {
 					node.setKid(1, new LirBinOp(node.kid(1).id, Op.LSHS, node.kid(1).type, node.kid(1).kid(0),
 							new LirIconst(node.kid(1).kid(1).id, node.kid(1).kid(1).type, logicalShift(((LirIconst) node.kid(1).kid(1)).value), node.kid(1).kid(1).opt), node.kid(1).opt));
+				} else if (node.kid(1).kid(0).opCode == Op.REG && logicalShift(((LirFconst) node.kid(1).kid(1)).value) != 0) {
+					node.setKid(1, new LirBinOp(node.kid(1).id, Op.LSHS, node.kid(1).type, node.kid(1).kid(0),
+							new LirFconst(node.kid(1).kid(1).id, node.kid(1).kid(1).type, logicalShift(((LirFconst) node.kid(1).kid(1)).value), node.kid(1).kid(1).opt), node.kid(1).opt));
 				} else if (node.kid(1).kid(1).opCode == Op.REG && logicalShift(((LirIconst) node.kid(1).kid(0)).value) != 0) {
 					node.setKid(1, new LirBinOp(node.kid(1).id, Op.LSHS, node.kid(1).type, node.kid(1).kid(1),
 							new LirIconst(node.kid(1).kid(0).id, node.kid(1).kid(0).type, logicalShift(((LirIconst) node.kid(1).kid(0)).value), node.kid(1).kid(0).opt), node.kid(1).opt));
+				} else if (node.kid(1).kid(1).opCode == Op.REG && logicalShift(((LirFconst) node.kid(1).kid(0)).value) != 0) {
+					node.setKid(1, new LirBinOp(node.kid(1).id, Op.LSHS, node.kid(1).type, node.kid(1).kid(1),
+							new LirFconst(node.kid(1).kid(0).id, node.kid(1).kid(0).type, logicalShift(((LirFconst) node.kid(1).kid(0)).value), node.kid(1).kid(0).opt), node.kid(1).opt));
 				}
 				return node;
 			case Op.DIVU:
@@ -264,6 +287,9 @@ public class PeepHole implements LocalTransformer {
 				if (node.kid(1).kid(0).opCode == Op.REG && logicalShift(((LirIconst) node.kid(1).kid(1)).value) != 0) {
 					node.setKid(1, new LirBinOp(node.kid(1).id, Op.RSHS, node.kid(1).type, node.kid(1).kid(0),
 							new LirIconst(node.kid(1).kid(1).id, node.kid(1).kid(1).type, logicalShift(((LirIconst) node.kid(1).kid(1)).value), node.kid(1).kid(1).opt), node.kid(1).opt));
+				} else if (node.kid(1).kid(0).opCode == Op.REG && logicalShift(((LirFconst) node.kid(1).kid(1)).value) != 0) {
+					node.setKid(1, new LirBinOp(node.kid(1).id, Op.RSHS, node.kid(1).type, node.kid(1).kid(0),
+							new LirFconst(node.kid(1).kid(1).id, node.kid(1).kid(1).type, logicalShift(((LirFconst) node.kid(1).kid(1)).value), node.kid(1).kid(1).opt), node.kid(1).opt));
 				}
 				return node;
 			default:
@@ -275,15 +301,33 @@ public class PeepHole implements LocalTransformer {
 		if (number == 0) {
 			return 0;
 		}
-		long k = number;
 		long i = 0;
 		// Check whether the number is a power of two.
-		while(k != 1) {
-			if (k % 2 != 0) {
+		while(number != 1) {
+			if (number % 2 != 0) {
 				// Return 0 in case number is not a power of two.
 				return 0;
 			}
-			k = k / 2;
+			number = number / 2;
+			i++;
+		}
+		// If function reaches this point number must be a power of two.
+		// -1 because shifting
+		return i-1;
+	}
+
+	private long logicalShift(double number) {
+		if (number == 0) {
+			return 0;
+		}
+		long i = 0;
+		// Check whether the number is a power of two.
+		while(number != 1) {
+			if (number % 2 != 0) {
+				// Return 0 in case number is not a power of two.
+				return 0;
+			}
+			number = number / 2;
 			i++;
 		}
 		// If function reaches this point number must be a power of two.
